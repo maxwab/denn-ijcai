@@ -1,0 +1,9 @@
+*.pdf
+*.pyc
+*.swp
+*.net
+*.pkl
+*.npy
+*.h5
+*.pt
+*.pth
