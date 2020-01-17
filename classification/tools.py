@@ -13,7 +13,10 @@ def optimize(net, optimizer, batch, add_repulsive_constraint=False, **kwargs):
 
     info = {}
     x, y = batch  # x is an image and y is an integer !
-    output = net(x)
+    if kwargs['beta'] > 0.0:
+        output = net(x) + kwargs['beta'] * kwargs['prior'](x).detach()
+    else:
+        output = net(x)
 
     if not add_repulsive_constraint:
         loss = criterion(output, y)

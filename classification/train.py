@@ -28,6 +28,11 @@ def train(args, experiment=None, device=None):
     # Loading dataset parameters
     if args.train.lower() == 'mnist':
         net = models.NNMNIST(28 * 28, 10).to(device)
+        if args.beta > 0.0:
+            prior = models.NNMNIST(28 * 28, 10).to(device)
+            prior.eval()
+        else:
+            prior = None
         # Load transforms
         tfms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), torchvision.transforms.Normalize((0.1307,), (0.3081,))])
         full_dset = torchvision.datasets.MNIST('../../datasets/MNIST', train=True, download=False, transform=tfms)
@@ -108,7 +113,7 @@ def train(args, experiment=None, device=None):
         # Training phase
         net.train()
         _tqdm = tqdm(train_loader, desc='batch')
-        experiment.log_current_epoch(epoch)
+        # experiment.log_current_epoch(epoch)
         for j, batch_raw in enumerate(_tqdm):
 
             if args.repulsive is not None:
@@ -125,16 +130,16 @@ def train(args, experiment=None, device=None):
             if args.repulsive is not None:
                 kwargs = {'reference_net': reference_net, 'batch_repulsive': batch_repulsive}
             else:
-                kwargs = {}
+                kwargs = {'beta':args.beta, 'prior': prior}
             info_training = _optimize(net, optimizer, batch, add_repulsive_constraint=args.repulsive is not None,
                                       **kwargs)
             if args.verbose:
                 _tqdm.set_description(
                     'Epoch {}/{}, loss: {:.4f}'.format(epoch + 1, args.n_epochs, info_training['loss']))
 
-            # Log to Comet.ml
-            for k, v in info_training.items():
-                experiment.log_metric(k, float(v), step=step)
+            # # Log to Comet.ml
+            # for k, v in info_training.items():
+            #     experiment.log_metric(k, float(v), step=step)
             step += 1
 
         if not Path.exists(savepath / 'models'):
@@ -169,16 +174,17 @@ def train(args, experiment=None, device=None):
             # Compute statistics
             print('Epoch {}/{}, val acc: {:.3f}, val loss: {:.3f}'.format(epoch + 1, args.n_epochs, total_val_acc,
                                                                           total_val_loss))
-            experiment.log_metric("val_accuracy", total_val_acc)
-            experiment.log_metric("val_loss", total_val_loss)
+            # experiment.log_metric("val_accuracy", total_val_acc)
+            # experiment.log_metric("val_loss", total_val_loss)
 
     # POST-PROCESSING
     # Save the model
     try:
-        if not Path.exists(savepath / 'models'):
-            os.makedirs(savepath / 'models')
+        dirname = 'models-beta:{}'.format(args.beta)
+        if not Path.exists(savepath / dirname):
+            os.makedirs(savepath / dirname)
 
-        model_path = savepath / 'models' / '{}_{}epochs.pt'.format(model_name, epoch + 1)
+        model_path = savepath / dirname / '{}_{}epochs.pt'.format(model_name, epoch + 1)
         if not Path.exists(model_path):
             torch.save(net.state_dict(), model_path)
     except FileExistsError:
@@ -206,6 +212,7 @@ def main():
     parser.add_argument('--disable-cuda', action='store_true',
                         help='Disable CUDA')
     parser.add_argument('--comet', action='store_true')
+    parser.add_argument('--beta', type=float, default=0.0)
 
     args = parser.parse_args()
     if not args.disable_cuda and torch.cuda.is_available():
@@ -214,10 +221,10 @@ def main():
         device = torch.device('cpu')
 
     # Log the experiment
-    experiment = Experiment(api_key="XXXXX", project_name="XXXXX", workspace="XXXXX",
-                            disabled=not args.comet)
-    experiment.train()
-    train(args, experiment, device)
+    # experiment = Experiment(api_key="XXXXX", project_name="XXXXX", workspace="XXXXX",
+    #                         disabled=not args.comet)
+    # experiment.train()
+    train(args, None, device)
 
 
 if __name__ == '__main__':
