@@ -28,6 +28,7 @@ parser.add_argument('--verbose', action='store_true')
 parser.add_argument('--comet', action='store_true')
 parser.add_argument('--save_folder', type=str, default='log/ensemble')
 parser.add_argument('--id', type=int)
+parser.add_argument('--beta', type=float, default=1.0)
 
 args = parser.parse_args()
 
@@ -76,6 +77,7 @@ dataset = RegressionDataset(X, Y)
 net = MLP(args.dropout_rate)
 # Create a prior
 prior = MLP(args.dropout_rate)
+prior.eval()
 criterion = nn.MSELoss()
 optimizer = optim.Adam(net.parameters(), lr=args.lr, weight_decay=args.wd)
 
@@ -91,7 +93,7 @@ for epoch in tqdm(np.arange(args.n_epochs), disable=not args.verbose):
         data, target = data.cpu(), target.cpu()
 
         optimizer.zero_grad()
-        output = net(data) + prior(data).detach()
+        output = net(data) + args.beta * prior(data).detach()
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
