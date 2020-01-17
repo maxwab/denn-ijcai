@@ -35,7 +35,7 @@ def train(args, experiment=None, device=None):
             prior = None
         # Load transforms
         tfms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), torchvision.transforms.Normalize((0.1307,), (0.3081,))])
-        full_dset = torchvision.datasets.MNIST('../../datasets/MNIST', train=True, download=False, transform=tfms)
+        full_dset = torchvision.datasets.MNIST('../../../datasets/MNIST', train=True, download=False, transform=tfms)
         prepr = lambda x: x.view(-1, 28 * 28)
     else:
         raise ValueError('Bad training dataset selected: {}'.format(args.train.lower()))
@@ -64,7 +64,7 @@ def train(args, experiment=None, device=None):
         pass
 
     # If the experiment is name we save it in results directly.
-    experiment.log_parameters(vars(args))
+    # experiment.log_parameters(vars(args))
 
     random.seed(args.seed)
     np.random.seed(args.seed)
