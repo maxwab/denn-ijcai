@@ -103,15 +103,15 @@ for epoch in tqdm(np.arange(args.n_epochs), disable=not args.verbose):
         # experiment.log_metric('train_loss', loss.item(), step=step)
 
 # Save the model
-if not Path.exists(savepath / 'models'):
-    os.makedirs(savepath / 'models')
+if not Path.exists(savepath / 'models-beta:{}'.format(args.beta)):
+    os.makedirs(savepath / 'models-beta:{}'.format(args.beta))
 
 model_path = savepath / 'models' / '{}_{}epochs.pt'.format(model_name, epoch+1)
 if not Path.exists(model_path):
     torch.save(net.state_dict(), model_path)
 
 prior_path = savepath / 'models' / '{}-prior_{}epochs.pt'.format(model_name, epoch+1)
-if not Path.exists(model_path):
-    torch.save(prior.state_dict(), model_path)
+if not Path.exists(prior_path):
+    torch.save(prior.state_dict(), prior_path)
 else:
     raise ValueError('Error trying to save file at location {}: File already exists'.format(model_path))
