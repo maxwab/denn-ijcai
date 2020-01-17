@@ -103,14 +103,15 @@ for epoch in tqdm(np.arange(args.n_epochs), disable=not args.verbose):
         # experiment.log_metric('train_loss', loss.item(), step=step)
 
 # Save the model
-if not Path.exists(savepath / 'models-beta:{}'.format(args.beta)):
-    os.makedirs(savepath / 'models-beta:{}'.format(args.beta))
+dirname = 'models-beta:{}'.format(args.beta)
+if not Path.exists(savepath / dirname):
+    os.makedirs(savepath / dirname)
 
-model_path = savepath / 'models' / '{}_{}epochs.pt'.format(model_name, epoch+1)
+model_path = savepath / dirname / '{}_{}epochs.pt'.format(model_name, epoch+1)
 if not Path.exists(model_path):
     torch.save(net.state_dict(), model_path)
 
-prior_path = savepath / 'models' / '{}-prior_{}epochs.pt'.format(model_name, epoch+1)
+prior_path = savepath / dirname / '{}-prior_{}epochs.pt'.format(model_name, epoch+1)
 if not Path.exists(prior_path):
     torch.save(prior.state_dict(), prior_path)
 else:
