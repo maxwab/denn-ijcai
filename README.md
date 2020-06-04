@@ -2,9 +2,8 @@
 Experiments for the paper _DENN_, _Handling Black Swan Events in Deep Learning with Diversely Extrapolated Neural Networks_, published at IJCAI 2020.
 
 # Datasets
-- [https://github.com/sanjaythakur/Multiple_Task_MuJoCo_Domains](https://github.com/sanjaythakur/Uncertainty-aware-Imitation-Learning-on-Multiple-Tasks-using-Bayesian-Neural-Networks/tree/master/MuJoCo)
 
-Feel free to contact me if you want me to send the .h5 versions of the datasets.
+Feel free to contact me if you want me to send the .h5 versions of the imitation datasets.
 
 # Regression
 - The ``.sh`` files to train the different models are available in ``exec/`` for each experiment.
