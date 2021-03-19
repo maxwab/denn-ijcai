@@ -2,7 +2,7 @@ comet-ml==1.0.51
 tqdm==4.31.1
 matplotlib==3.0.2
 mujoco-py==0.5.7
-Pillow==5.4.1
+Pillow==8.1.1
 scikit-image==0.14.2
 torchvision==0.2.2.post3
 h5py==2.9.0
